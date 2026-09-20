@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ale_onlus
+      POSTGRES_PASSWORD: ale_onlus
+      POSTGRES_DB: ale_onlus
+    ports:
+      - "5432:5432"
+    volumes:
+      - ale_onlus_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ale_onlus -d ale_onlus"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ale_onlus_pgdata:
