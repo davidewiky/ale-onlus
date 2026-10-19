@@ -7,7 +7,8 @@ services:
       POSTGRES_PASSWORD: ale_onlus
       POSTGRES_DB: ale_onlus
     ports:
-      - "5432:5432"
+      # Solo da questo computer: mai esposto sulla rete/tunnel
+      - "127.0.0.1:5432:5432"
     volumes:
       - ale_onlus_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -15,6 +16,28 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://ale_onlus:ale_onlus@db:5432/ale_onlus?schema=public
+      AUTH_SECRET: ${AUTH_SECRET:-changeme-generate-a-random-secret}
+      AUTH_URL: ${AUTH_URL:-http://localhost:3000}
+      # Necessario dietro proxy/tunnel (Auth.js si fida dell'host della richiesta)
+      AUTH_TRUST_HOST: "true"
+      AUTH_GOOGLE_ID: ${AUTH_GOOGLE_ID:-}
+      AUTH_GOOGLE_SECRET: ${AUTH_GOOGLE_SECRET:-}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@ilsognodiale.it}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-ChangeMe123!}
+      SEED_ADMIN_NAME: ${SEED_ADMIN_NAME:-Amministratore}
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   ale_onlus_pgdata:

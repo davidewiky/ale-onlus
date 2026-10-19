@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { RegisterForm } from "@/app/registrati/RegisterForm";
+import { GoogleButton } from "@/components/GoogleButton";
+import { isGoogleAuthEnabled } from "@/auth";
 
 export const metadata: Metadata = {
   title: "Registrati",
@@ -16,6 +18,11 @@ export default function RegistratiPage() {
           Registrati per accedere alla sezione eventi e iscriverti alle nostre iniziative.
         </p>
         <div className="mt-6">
+          {isGoogleAuthEnabled && (
+            <div className="mb-5">
+              <GoogleButton callbackUrl="/eventi" label="Registrati con Google" />
+            </div>
+          )}
           <RegisterForm />
         </div>
         <p className="mt-6 text-center text-xs text-ink-400">

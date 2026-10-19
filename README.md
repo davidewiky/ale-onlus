@@ -63,8 +63,10 @@ cp .env.example .env
 
 ### 4. Database Postgres (Docker)
 
+Per lo sviluppo locale con `npm run dev` avvia solo Postgres:
+
 ```bash
-docker compose up -d
+docker compose up -d db
 ```
 
 ### 5. Migrazioni e seed
@@ -87,6 +89,24 @@ npm run dev
 ```
 
 L'app sarà disponibile su [http://localhost:3000](http://localhost:3000).
+
+## Avvio completo in Docker (test)
+
+Per provare l'app come stack unico (Next.js + Postgres, con migrazioni e seed all'avvio):
+
+```bash
+docker compose up --build
+```
+
+L'app sarà disponibile su [http://localhost:3000](http://localhost:3000). La porta `3000` deve essere libera (ferma `npm run dev` se è già in esecuzione).
+
+All'avvio del container `app` vengono applicate le migrazioni Prisma e viene eseguito il seed. Le credenziali di test sono le stesse dello sviluppo locale.
+
+Per spegnere lo stack:
+
+```bash
+docker compose down
+```
 
 ## Script disponibili
 
@@ -118,6 +138,24 @@ L'accesso avviene tramite **email e password** (provider Credentials di Auth.js)
 delle password via `bcryptjs`. Non sono al momento configurati provider OAuth di terze parti
 (Google, Facebook, ecc.): l'architettura di Auth.js li supporta nativamente, quindi possono
 essere aggiunti in `src/auth.ts` in un secondo momento senza modifiche strutturali.
+
+### Registrazione con Google (opzionale)
+
+Oltre a email e password, gli utenti possono registrarsi e accedere con il proprio account Google.
+Il pulsante compare in `/login` e `/registrati` solo se sono impostate `AUTH_GOOGLE_ID` e
+`AUTH_GOOGLE_SECRET`.
+
+1. Su [Google Cloud Console](https://console.cloud.google.com/apis/credentials) crea un
+   "ID client OAuth" di tipo *Applicazione web*.
+2. Tra gli *URI di reindirizzamento autorizzati* aggiungi `<AUTH_URL>/api/auth/callback/google`
+   (in locale: `http://localhost:3000/api/auth/callback/google`).
+3. Copia ID e segreto client in `.env` come `AUTH_GOOGLE_ID` e `AUTH_GOOGLE_SECRET`.
+
+Al primo accesso con Google viene creato automaticamente un utente `USER` (senza password locale).
+Se esiste già un account con la stessa email registrato con password, l'accesso con Google viene
+rifiutato e l'utente è invitato ad accedere con la password: l'email non è verificata alla
+registrazione classica, quindi il collegamento automatico permetterebbe di "occupare" in anticipo
+l'account di qualcun altro.
 
 - Utenti autenticati (ruolo `USER`): possono accedere alla sezione `/eventi` e iscriversi/
   disiscriversi dagli eventi.
