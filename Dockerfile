@@ -14,6 +14,10 @@ RUN npm ci
 
 COPY . .
 
+# Link di donazione PayPal: le variabili NEXT_PUBLIC_* sono fissate in fase di build
+ARG NEXT_PUBLIC_PAYPAL_DONATE_URL=""
+ENV NEXT_PUBLIC_PAYPAL_DONATE_URL=$NEXT_PUBLIC_PAYPAL_DONATE_URL
+
 RUN npm run build
 
 EXPOSE 3000

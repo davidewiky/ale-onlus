@@ -132,6 +132,14 @@ docker compose down
 - I contenuti su malattia e traguardi della fondazione sono testi editoriali di esempio, da
   rivedere con i contenuti reali dell'associazione.
 
+## Banner donazioni
+
+Un banner fisso in basso a destra (`src/components/DonateBanner.tsx`, montato nel layout) resta
+visibile durante lo scroll su tutte le pagine tranne `/admin`. Il pulsante apre il link PayPal in
+`NEXT_PUBLIC_PAYPAL_DONATE_URL`; se la variabile è vuota porta a `/dona`. Essendo una variabile
+`NEXT_PUBLIC_*`, il valore viene fissato in fase di build: con Docker dopo averla cambiata esegui
+`docker compose up -d --build`.
+
 ## Autenticazione
 
 L'accesso avviene tramite **email e password** (provider Credentials di Auth.js), con hashing
